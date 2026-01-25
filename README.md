@@ -1,5 +1,5 @@
 ## Win‑AI — Simple Gemini Interface for Windows
------
+
 Win‑AI is a lightweight Windows desktop application that provides a simple interface for interacting with Google Gemini. The program is built as a single executable file and allows users to:
 
 Take screenshots
@@ -38,7 +38,7 @@ speech_recognition	Audio-to-text processing
 
 -----
 ## Installation and Launch
----
+
 
 Download the setup installer.
 
@@ -58,7 +58,7 @@ Insert your key into the settings field inside the application.
 
 -----
 ## Developer
----
+
 
 **teri-farti - tf_game**  
 Webite: https://teri-farti.github.io/tf_game_page/
