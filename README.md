@@ -1,29 +1,32 @@
-Win‑AI — Simple Gemini Interface for Windows
-
+## Win‑AI — Simple Gemini Interface for Windows
+-----
 Win‑AI is a lightweight Windows desktop application that provides a simple interface for interacting with Google Gemini. The program is built as a single executable file and allows users to:
 
-    Take screenshots
+Take screenshots
 
-    Record audio
+Record audio
 
-    Send text prompts
+Send text prompts
 
-    Receive responses from Gemini in a clean interface
+Receive responses from Gemini in a clean interface
+
+---
 
 The application is designed as a minimal tool for quick access to AI features without using a browser.
 Features
+Text prompt support
 
-    Text prompt support
+Screenshot capture
 
-    Screenshot capture
+Audio recording and speech recognition
 
-    Audio recording and speech recognition
+Multimodal requests to Gemini
 
-    Multimodal requests to Gemini
+Simple PyQt5-based GUI
 
-    Simple PyQt5-based GUI
+Distributed as a single EXE file
 
-    Distributed as a single EXE file
+---
 
 Technologies Used
 Component	Purpose
@@ -32,18 +35,31 @@ PyCharm	Development environment
 PyQt5	Graphical user interface
 google.genai	Gemini API integration
 speech_recognition	Audio-to-text processing
-Installation and Launch
 
-    Download the setup installer.
+-----
+## Installation and Launch
+---
 
-    Install the application.
+Download the setup installer.
 
-    Launch the program using win-ai.exe.
+Install the application.
 
-    Enter your Google API Key in the application settings.
+Launch the program using win-ai.exe.
+
+Enter your Google API Key in the application settings.
+
+---
 
 After entering the key, the application is ready to use.
 API Key
 
 Win‑AI requires a Google AI Studio API key.
 Insert your key into the settings field inside the application.
+
+-----
+## Developer
+---
+
+**teri-farti - tf_game**  
+Webite: https://teri-farti.github.io/tf_game_page/
+GitHub: https://github.com/teri-farti
