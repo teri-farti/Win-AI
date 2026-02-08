@@ -57,6 +57,32 @@ Win‑AI requires a Google AI Studio API key.
 Insert your key into the settings field inside the application.
 
 -----
+
+
+## Support my projects
+
+If you want to support the development, here are my crypto addresses:
+
+### 🌐 EVM (ETH / USDT / BNB / MATIC)
+0x7a6D3A943fb0b83aeF9adfA01899a175daecbBBF
+
+### ⚡️ Solana
+3CAUvQYbE4kKQvaVErHvxBMPCxvvRYsYt4FpvdUZsYTq
+
+### 🔵 TON
+UQDogqc3a9oA5nD5PUSBtkTqkOVMgHwLx5zGIYFQosZ68SBQ
+
+### 🔺 TRON (TRC20)
+TM8YHpAs9HUFF6MAPvukdUxqax233nRBQZ
+
+### ⭐️ Stellar (XLM)
+GAQJG6576Q6OR3HPB6JDFN4K7VF4QH5YBLM6MXKZEEWKLNO6LJ72BQAZ
+
+### ₿ Bitcoin
+bc1qvu9vu6s9snfs5n7cytf2hqhkasg9qamwcyumpq
+
+---
+
 ## Developer
 
 
