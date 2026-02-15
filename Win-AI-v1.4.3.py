@@ -38,50 +38,126 @@ if GOOGLE_API_KEY == "YOUR_GOOGLE_GEMINI_API_KEY":
 
 GEMINI_API_KEY = GOOGLE_API_KEY
 
+LANGUAGES = {
+    "RU": {
+        "msg": "Пожалуйста, введите ваш Google Win-AI API ключ.\nВы можете получить его здесь:",
+        "placeholder": "Введите ваш API ключ здесь...",
+        "lang_label": "Выберите язык интерфейса:",
+        "title": "Настройка Win-AI"
+    },
+    "EN": {
+        "msg": "Please enter your Google Win-AI API key.\nYou can get it here:",
+        "placeholder": "Enter your API key here...",
+        "lang_label": "Select interface language:",
+        "title": "Win-AI Settings"
+    }
+}
+UI_TEXTS = {
+    "ru": {
+        "chat_cleared": "Чат очищен.",
+        "thinking": "Думаю...",
+        "listening": "Слушаю...",
+        "recording_stopped": "Запись аудио остановлена.",
+        "file_sent": "Файл '{file}' отправлен в Win-AI для анализа...",
+        "file_cancel": "Выбор файла отменен.",
+        "model_not_init": "Ошибка: Модель Win-AI не инициализирована.",
+        "audio_error_title": "Ошибка аудио",
+        "api_set": "API ключ установлен. Инициализация Win-AI...",
+        "api_not_set": "API ключ не установлен.",
+        "mic_off": "Аудио",
+        "mic_on": "Выключить микрофон",
+        "you": "Вы",
+        "ai": "Win-AI"
+    },
+    "en": {
+        "chat_cleared": "Chat cleared.",
+        "thinking": "Thinking...",
+        "listening": "Listening...",
+        "recording_stopped": "Audio recording stopped.",
+        "file_sent": "File '{file}' sent to Win-AI for analysis...",
+        "file_cancel": "File selection cancelled.",
+        "model_not_init": "Error: Win-AI model not initialized.",
+        "audio_error_title": "Audio Error",
+        "api_set": "API key set. Initializing Win-AI...",
+        "api_not_set": "API key not set.",
+        "mic_off": "Audio",
+        "mic_on": "Turn off microphone",
+        "you": "You",
+        "ai": "Win-AI"
+    }
+}
+
 
 class ApiKeyInputDialog(QDialog):
-    def __init__(self, parent=None, current_key=""):
+    def __init__(self, parent=None, current_key="", current_lang="EN"):
         super().__init__(parent)
-        self.setWindowTitle("Введите API ключ Win-AI")
-        self.setFixedSize(500, 250)
-
+        self.setFixedSize(500, 320)
         self.layout = QVBoxLayout(self)
 
-
-        self.message_label = QLabel(
-            "Пожалуйста, введите ваш Google Win-AI API ключ.\n"
-            "Вы можете получить его здесь:"
-        )
+        # Создаем элементы без текста (текст установит retranslate_ui)
+        self.message_label = QLabel()
         self.message_label.setAlignment(Qt.AlignCenter)
         self.message_label.setFont(QFont('Segoe UI', 12))
-        self.layout.addWidget(self.message_label)
 
-
-        self.link_label = QLabel("<a href='https://aistudio.google.com/app/apikey'>aistudio.google.com/app/apikey</a>")
+        self.link_label = QLabel("<a href='https://aistudio.google.com'>://aistudio.google.com</a>")
         self.link_label.setOpenExternalLinks(True)
         self.link_label.setAlignment(Qt.AlignCenter)
-        self.link_label.setFont(QFont('Segoe UI', 10))
-        self.layout.addWidget(self.link_label)
-
 
         self.key_input = QLineEdit(self)
-        self.key_input.setPlaceholderText("Введите ваш API ключ здесь...")
         self.key_input.setText(current_key)
         self.key_input.setEchoMode(QLineEdit.Password)
-        self.key_input.setFont(QFont('Segoe UI', 10))
-        self.layout.addWidget(self.key_input)
+
+        lang_layout = QHBoxLayout()
+        self.lang_label = QLabel()
+        self.lang_combo = QComboBox()
+        self.lang_combo.addItems(["RU", "EN"])
+        self.lang_combo.setCurrentText(current_lang)
+
+        # СИГНАЛ: при смене языка в комбобоксе вызываем перевод
+        self.lang_combo.currentTextChanged.connect(self.retranslate_ui)
+
+        lang_layout.addWidget(self.lang_label)
+        lang_layout.addWidget(self.lang_combo)
 
         self.button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.Help)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
-        self.button_box.helpRequested.connect(self.open_gemini_api_key_url)
 
+        # Добавляем на макет
+        self.layout.addWidget(self.message_label)
+        self.layout.addWidget(self.link_label)
+        self.layout.addLayout(lang_layout)
+        self.layout.addWidget(self.key_input)
         self.layout.addWidget(self.button_box)
 
+        self.retranslate_ui(self.lang_combo.currentText())
         self.apply_styles()
 
-    def get_api_key(self):
-        return self.key_input.text()
+    def retranslate_ui(self, lang):
+        """Метод для динамической смены текста"""
+        texts = LANGUAGES.get(lang, LANGUAGES["RU"])
+
+        self.setWindowTitle(texts["title"])
+        self.message_label.setText(texts["msg"])
+        self.key_input.setPlaceholderText(texts["placeholder"])
+        self.lang_label.setText(texts["lang_label"])
+
+        # Обновляем текст стандартных кнопок
+        ok_btn = self.button_box.button(QDialogButtonBox.Ok)
+        cancel_btn = self.button_box.button(QDialogButtonBox.Cancel)
+        help_btn = self.button_box.button(QDialogButtonBox.Help)
+
+        if lang == "EN":
+            if ok_btn: ok_btn.setText("OK")
+            if cancel_btn: cancel_btn.setText("Cancel")
+            if help_btn: help_btn.setText("Help")
+        else:
+            if ok_btn: ok_btn.setText("Готово")
+            if cancel_btn: cancel_btn.setText("Отмена")
+            if help_btn: help_btn.setText("Помощь")
+
+    def get_data(self):
+        return self.key_input.text(), self.lang_combo.currentText()
 
     def open_gemini_api_key_url(self):
         webbrowser.open("https://aistudio.google.com/app/apikey")
@@ -89,49 +165,53 @@ class ApiKeyInputDialog(QDialog):
     def apply_styles(self):
         self.setStyleSheet("""
             QDialog {
-                background-color: rgba(32, 32, 32, 0.95); /* Полупрозрачный темный фон */
-                border-radius: 15px; /* Скругленные углы */
-                border: 1px solid rgba(70, 70, 70, 0.7); /* Тонкая рамка */
+                background-color: rgba(32, 32, 32, 0.95);
+                border-radius: 15px;
+                border: 1px solid rgba(70, 70, 70, 0.7);
             }
-            QLabel {
-                color: #e0e0e0; /* Светлый текст */
-            }
-            QLabel a {
-                color: #8A2BE2; /* Фиолетовый цвет для ссылок */
-                text-decoration: underline; /* Подчеркивание ссылок */
-            }
-            QLineEdit {
-                background-color: rgba(60, 60, 60, 0.9); /* Темно-серый фон поля ввода */
+            QLabel { color: #e0e0e0; }
+            QLabel a { color: #8A2BE2; text-decoration: underline; }
+
+            QLineEdit, QComboBox {
+                background-color: rgba(60, 60, 60, 0.9);
                 color: #e0e0e0;
                 border: 1px solid rgba(80, 80, 80, 0.7);
                 border-radius: 10px;
-                padding: 10px;
+                padding: 5px 10px;
                 font-family: 'Segoe UI', sans-serif;
-                font-size: 16px;
             }
-            QLineEdit:focus {
-                border: 1px solid #8A2BE2; /* Фиолетовая рамка при фокусе */
+
+            QComboBox {
+                font-size: 14px;
+                min-width: 80px;
             }
+
+            QComboBox::drop-down {
+                border: none;
+                width: 30px;
+            }
+
+            QComboBox QAbstractItemView {
+                background-color: #333;
+                color: #e0e0e0;
+                selection-background-color: #8A2BE2;
+            }
+
+            QLineEdit:focus, QComboBox:focus {
+                border: 1px solid #8A2BE2;
+            }
+
             QPushButton {
-                background-color: #8A2BE2; /* Фиолетовый фон кнопок */
+                background-color: #8A2BE2;
                 color: white;
                 border: none;
                 padding: 8px 12px;
                 border-radius: 8px;
                 font-size: 14px;
                 font-weight: bold;
-                font-family: 'Segoe UI', sans-serif;
             }
-            QPushButton:hover {
-                background-color: #9932CC; /* Более светлый фиолетовый при наведении */
-            }
-            QPushButton:pressed {
-                background-color: #7B1FA2; /* Более темный фиолетовый при нажатии */
-            }
-            QDialogButtonBox QPushButton {
-                min-width: 80px; /* Минимальная ширина кнопок в QDialogButtonBox */
-                padding: 8px 15px;
-            }
+            QPushButton:hover { background-color: #9932CC; }
+            QPushButton:pressed { background-color: #7B1FA2; }
         """)
 
 
@@ -225,6 +305,7 @@ class OverlayPanel(QWidget):
         self.resizing_edge = None
         self.old_pos = None
         self.old_pos_global = None
+        self.current_language = "ru"
 
         self._setup_ui()
 
@@ -235,6 +316,34 @@ class OverlayPanel(QWidget):
         self.autoscroll_chat()
         self.show()
         self.toggle_panel.hide()
+
+    def update_ui_language(self):
+        if self.current_language == "ru":
+            self.send_button.setText("Отправить")
+            self.open_file_button.setText("Файл")
+            self.toggle_audio_button.setText("Аудио")
+            self.clear_chat_button.setText("Очистить чат")
+            self.chat_input.setPlaceholderText("Введите сообщение...")
+        else:
+            self.send_button.setText("Send")
+            self.open_file_button.setText("File")
+            self.toggle_audio_button.setText("Audio")
+            self.clear_chat_button.setText("Clear chat")
+            self.chat_input.setPlaceholderText("Input message...")
+
+    def t(self, key, **kwargs):
+        text = UI_TEXTS[self.current_language].get(key, key)
+        return text.format(**kwargs)
+
+    def change_language(self):
+        self.current_language = self.language_selector.currentData()
+        self.settings['language'] = self.current_language
+        self.save_settings()
+        self.update_ui_language()
+        if self.current_language == "ru":
+            self.chat_display.append("<p style='color:#8A2BE2;'>Win-AI: Язык переключен на русский.</p>")
+        else:
+            self.chat_display.append("<p style='color:#8A2BE2;'>Win-AI: Language switched to English.</p>")
 
     def _setup_ui(self):
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Tool)
@@ -261,9 +370,15 @@ class OverlayPanel(QWidget):
         self.control_layout = QHBoxLayout(self.control_panel)
         self.control_layout.setContentsMargins(10, 10, 10, 10)
 
-        self.title_label = QLabel("Win-AI (v1.4.3)")
+        self.title_label = QLabel("Win-AI (v1.5.0)")
         self.title_label.setObjectName("titleLabel")
         self.control_layout.addWidget(self.title_label)
+
+        self.language_selector = QComboBox()
+        self.language_selector.addItem("Русский", "ru")
+        self.language_selector.addItem("English", "en")
+        self.language_selector.currentIndexChanged.connect(self.change_language)
+        self.control_layout.addWidget(self.language_selector)
 
         self.control_layout.addStretch()
 
@@ -698,7 +813,7 @@ class OverlayPanel(QWidget):
     def clear_chat(self):
         self.chat_display.clear()
         self.chat_history = []
-        self.chat_display.append("<p style='color:#8A2BE2;'>Win-AI: Чат очищен.</p>")
+        self.chat_display.append(f"<p style='color:#8A2BE2;'>{self.t('ai')}: {self.t('chat_cleared')}</p>")
         self.save_settings() #
 
     def load_settings(self):
@@ -707,6 +822,11 @@ class OverlayPanel(QWidget):
                 self.settings = json.load(f)
         else:
             self.settings = {}
+
+        self.current_language = self.settings.get('language', 'ru')
+
+        index = 0 if self.current_language == "ru" else 1
+        self.language_selector.setCurrentIndex(index)
 
         current_width = self.settings.get('width', 750)
         current_height = self.settings.get('height', 500)
@@ -768,16 +888,16 @@ class OverlayPanel(QWidget):
                 GEMINI_API_KEY = key
                 self.settings['api_key'] = key
                 self.save_settings()
-                self.chat_display.append("<p style='color:#8A2BE2;'>API ключ установлен. Инициализация Win-AI...</p>")
+                self.chat_display.append("<p style='color:#8A2BE2;'>The API key has been installed. Initializing Win-AI...</p>")
                 self.initialize_gemini()
             else:
-                QMessageBox.warning(self, "Ошибка", "API ключ не может быть пустым. Функции Win-AI будут отключены.")
+                QMessageBox.warning(self, "Error", "API key cannot be empty. Win-AI features will be disabled.")
                 self.chat_display.append("<p style='color:red;'>API ключ не установлен.</p>")
                 self.send_button.setEnabled(False)
                 self.open_file_button.setEnabled(False)
                 self.toggle_audio_button.setEnabled(False)
         else:
-            self.chat_display.append("<p style='color:red;'>API ключ не установлен. Функции Win-AI будут отключены.</p>")
+            self.chat_display.append("<p style='color:red;'>The API key is not installed. Win-AI features will be disabled.</p>")
             self.send_button.setEnabled(False)
             self.open_file_button.setEnabled(False)
             self.toggle_audio_button.setEnabled(False)
@@ -799,13 +919,13 @@ class OverlayPanel(QWidget):
                 self.open_file_button.setEnabled(False)
                 self.toggle_audio_button.setEnabled(False)
                 self.chat_display.append(
-                    f"<p style='color:red;'>Ошибка: Модель Win-AI не инициализирована. Проверьте API ключ и подключение к интернету: {e}</p>")
+                    f"<p style='color:red;'>Error: The Win-AI model is not initialized. Check your API key and internet connection: {e}</p>")
         else:
             self.send_button.setEnabled(False)
             self.open_file_button.setEnabled(False)
             self.toggle_audio_button.setEnabled(False)
             self.chat_display.append(
-                "<p style='color:red;'>Ошибка: API ключ Google Win-AI не установлен. Функции Win-AI и связанные с ними будут отключены.</p>")
+                "<p style='color:red;'>Error: The Google Win-AI API key is not installed. Win-AI and related features will be disabled.</p>")
 
     def autoscroll_chat(self):
         self.chat_display.verticalScrollBar().setValue(self.chat_display.verticalScrollBar().maximum())
@@ -853,7 +973,7 @@ class OverlayPanel(QWidget):
 
     def select_file_for_analysis(self):
         if not self.gemini_model:
-            self.chat_display.append("<p style='color:red;'>Ошибка: Модель Win-AI не инициализирована. Невозможно анализировать файлы.</p>")
+            self.chat_display.append("<p style='color:red;'>Error: Win-AI model not initialized. Unable to parse files.</p>")
             return
 
         options = QFileDialog.Options()
@@ -942,12 +1062,20 @@ class OverlayPanel(QWidget):
                     mime_type = "audio/aac"
 
                 self.send_message(f"Проанализируй содержимое этого файла: {file_name}", file_data=file_data, file_name=file_name, file_mime_type=mime_type)
-                self.chat_display.append(f"<p style='color:#8A2BE2;'>Win-AI: Файл '{file_name}' отправлен в Win-AI для анализа...</p>")
+                self.chat_display.append(
+                    f"<p style='color:#8A2BE2;'>{self.t('ai')}: {self.t('file_sent', file=file_name)}</p>"
+                )
+
 
             except Exception as e:
-                self.chat_display.append(f"<p style='color:red;'>Ошибка чтения файла: {e}</p>")
+                self.chat_display.append(
+                    f"<p style='color:red;'>{self.t('ai')}: {self.t('file_cancel')}</p>"
+                )
+
         else:
-            self.chat_display.append("<p style='color:red;'>Win-AI: Выбор файла отменен.</p>") # Если файл не выбран
+            self.chat_display.append(
+                f"<p style='color:red;'>{self.t('ai')}: {self.t('file_cancel')}</p>"
+            )
 
     def send_message_from_input(self):
         message_text = self.chat_input.toPlainText().strip()
@@ -957,23 +1085,29 @@ class OverlayPanel(QWidget):
 
     def send_message(self, text, image_data=None, file_data=None, file_name=None, file_mime_type=None):
         if not self.gemini_model:
-            self.chat_display.append("<p style='color:red;'>Ошибка: Модель Win-AI не инициализирована.</p>")
+            self.chat_display.append("<p style='color:red;'>Error: Win-AI model not initialized.</p>")
             return
 
         self.send_button.setEnabled(False)
 
-        user_message_html = f"<p style='color:#FFFFFF;'>Вы: {text}</p>"
+        user_message_html = f"<p style='color:#FFFFFF;'>{self.t('you')}: {text}</p>"
         self.chat_display.append(user_message_html)
         self.chat_history.append(user_message_html)
 
-        self.chat_display.append("<p style='color:#8A2BE2;'>Win-AI: Думаю...</p>")
+        self.chat_display.append(f"<p style='color:#8A2BE2;'>{self.t('ai')}: {self.t('thinking')}</p>")
 
         prompt_parts = []
+
+        if self.current_language == "ru":
+            language_instruction = "Ответь на русском языке."
+        else:
+            language_instruction = "Answer in English."
         if file_data and file_name and file_mime_type:
             prompt_parts.append({"mime_type": file_mime_type, "data": file_data})
-            prompt_parts.append(f"Проанализируй файл {file_name}: {text}")
+            prompt_parts.append(f"{language_instruction}\nAnalyze file {file_name}: {text}")
+
         else:
-            prompt_parts.append(text)
+            prompt_parts.append(f"{language_instruction}\n{text}")
 
         self.worker_thread = WorkerThread(self.gemini_model, prompt_parts)
         self.worker_thread.response_received.connect(self.handle_gemini_response)
@@ -1009,11 +1143,11 @@ class OverlayPanel(QWidget):
             if last_think_index != -1:
                 html_content = html_content[:last_think_index]
                 self.chat_display.setHtml(html_content)
-        self.chat_display.append(f"<p style='color:red;'>Win-AI: ОШИБКА: {error_message}</p>")
+        self.chat_display.append(f"<p style='color:#8A2BE2;'>{self.t('ai')}: {error_message}</p>")
 
         if self.chat_history and self.chat_history[-1].strip() == think_html.strip():
             self.chat_history.pop()
-        self.chat_history.append(f"<p style='color:red;'>Win-AI: ОШИБКА: {error_message}</p>")
+        self.chat_display.append(f"<p style='color:#8A2BE2;'>{self.t('ai')}: {error_message}</p>")
 
         self.send_button.setEnabled(True)
         self.autoscroll_chat()
@@ -1035,32 +1169,35 @@ class OverlayPanel(QWidget):
             self.chat_display.append("<p style='color:red;'>Не могу начать запись аудио: PyAudio не установлен.</p>")
             return
 
-        self.audio_thread = AudioWorkerThread()
+        self.audio_thread = AudioWorkerThread(self)
         self.audio_thread.transcribed_text.connect(self.handle_transcribed_text)
         self.audio_thread.error_occurred.connect(self.handle_audio_error)
         self.audio_thread.start()
         self.recording_in_progress = True
-        self.toggle_audio_button.setText("Выключить микрофон")
+        self.toggle_audio_button.setText(self.t("mic_on"))
         self.toggle_audio_button.setStyleSheet("QPushButton#toggleAudioButton.active { background-color: #dc3545; color: white; }")
         self.toggle_audio_button.setProperty("class", "active")
         self.toggle_audio_button.style().polish(self.toggle_audio_button)
-        self.chat_display.append("<p style='color:#8A2BE2;'>Win-AI: Слушаю...</p>")
+        self.chat_display.append(f"<p style='color:#8A2BE2;'>{self.t('ai')}: {self.t('listening')}</p>")
 
     def stop_audio_recording(self):
         if self.audio_thread and self.audio_thread.isRunning():
             self.audio_thread.stop()
             self.recording_in_progress = False
-            self.toggle_audio_button.setText("Аудио")
             self.toggle_audio_button.setProperty("class", "")
             self.toggle_audio_button.style().polish(self.toggle_audio_button)
-            self.chat_display.append("<p style='color:#8A2BE2;'>Win-AI: Запись аудио остановлена.</p>")
+            self.toggle_audio_button.setText(self.t("mic_off"))
+
+            self.chat_display.append(
+                f"<p style='color:#8A2BE2;'>{self.t('ai')}: {self.t('recording_stopped')}</p>"
+            )
 
     def handle_transcribed_text(self, text):
         self.chat_input.setText(text)
         self.send_message_from_input()
 
     def handle_audio_error(self, error_message):
-        QMessageBox.critical(self, "Ошибка аудио", error_message)
+        QMessageBox.critical(self, self.t("audio_error_title"), error_message)
         self.chat_display.append(f"<p style='color:red;'>Audio Error: {error_message}</p>")
         self.stop_audio_recording()
 
@@ -1090,7 +1227,8 @@ class AudioWorkerThread(QThread):
                 while self.running:
                     try:
                         audio = self.recognizer.listen(source, timeout=10, phrase_time_limit=15)
-                        text = self.recognizer.recognize_google(audio, language="ru-RU")
+                        lang = "ru-RU" if self.parent().current_language == "ru" else "en-US"
+                        text = self.recognizer.recognize_google(audio, language=lang)
                         if text:
                             self.transcribed_text.emit(text)
                     except sr.UnknownValueError:
